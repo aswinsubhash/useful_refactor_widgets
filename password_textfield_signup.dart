@@ -1,14 +1,26 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:getwork/app/modules/sign_up/controllers/sign_up_controller.dart';
+import 'package:getwork/app/modules/auth/sign_up/controllers/sign_up_controller.dart';
 import 'package:getwork/app/utils/colors.dart';
 
-class PasswordTextField extends GetView<SignUpController> {
+class PasswordTextField extends GetView {
   final String hintText;
-  PasswordTextField({
-    required this.hintText,
-  });
+  final String validationMessage;
+  
+  final String? minPassText;
+  final String type;
+  @override
+  final TextEditingController controller;
+  PasswordTextField(
+      {required this.hintText,
+      required this.validationMessage,
+    
+      this.minPassText,
+      required this.controller,
+      required this.type});
+
   @override
   Widget build(BuildContext context) {
     final signUpController = Get.put(SignUpController());
@@ -17,11 +29,25 @@ class PasswordTextField extends GetView<SignUpController> {
       children: [
         Obx(
           () => SizedBox(
-            height: 50,
+            height: 75,
             width: size.width * 0.9,
             child: TextFormField(
+              controller: controller,
               cursorColor: greenColor,
               obscureText: signUpController.isPasswordHidden.value,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return validationMessage;
+                } else {
+                  if (value.length < 6) {
+                    return minPassText;
+                  }
+                }
+                return null;
+              },
+              onChanged: (value) => type == 'Password'
+                  ? signUpController.password.value = value
+                  : (value) => signUpController.confirmPassword.value,
               style: TextStyle(
                 fontSize: 15,
               ),
